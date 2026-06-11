@@ -115,7 +115,7 @@ def main():
     try:
         while True:
             conn, addr = server_socket.accept()
-            # ★ 多线程支持: 每个客户端独立线程处理
+            #  多线程支持: 每个客户端独立线程处理
             client_thread = threading.Thread(
                 target=handle_client,
                 args=(conn, addr),

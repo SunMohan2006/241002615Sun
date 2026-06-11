@@ -36,7 +36,7 @@ def generate_chunks(total_length, lmin, lmax, seed=None):
 
 
 def main():
-    # ★ 修复点: 新增可选的 Seed 参数
+    # ★ 新增可选的 Seed 参数
     if len(sys.argv) < 5 or len(sys.argv) > 6:
         print("用法: python reversetcpclient.py <IP> <Port> <Lmin> <Lmax> [Seed]")
         print("  Seed: 可选，随机种子，用于复现分块结果（验收需要）")
@@ -56,10 +56,10 @@ def main():
     file_content = b"a little monkey is jumping on the tree."
     total_length = len(file_content)
 
-    # ★ 修复点: 使用可复现的分块算法
+    # ★  使用可复现的分块算法
     chunk_sizes, n_chunks = generate_chunks(total_length, lmin, lmax, seed)
 
-    # 在日志中记录分块信息（便于验收时核对）
+    # 在日志中记录分块信息（总长度、分块数、每块长度、Seed）
     log_event(
         f"分块参数: 文件总长={total_length}B, Lmin={lmin}, Lmax={lmax}, "
         f"Seed={seed if seed is not None else '无(随机)'}, "
@@ -112,7 +112,6 @@ def main():
                     )
 
                     decoded_text = reversed_data.decode('ascii')
-                    # ★ 修复点: 打印格式更接近要求示例
                     # 要求示例: "8: yeknom elttil a."
                     print(f"{i+1}: {decoded_text}")
 

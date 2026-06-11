@@ -92,6 +92,7 @@ def main():
         send_times = {}              # seq_no(1-based) → 最近发送时间
         rtt_values = []              # 已确认包的 RTT 值列表
         acked_packets = set()        # 已确认的 seq_no (1-based)
+        in_retransmit = False        # 当前是否处于重传阶段
 
         # ================================================================
         # 阶段 3: GBN 滑动窗口传输
@@ -112,8 +113,12 @@ def main():
                 send_times[seq_no] = time.time()
                 bytes_in_flight += pkt_size
 
-                print(f"第 {seq_no} 个（第 {byte_starts[next_seq]}~"
-                      f"{byte_ends[next_seq]} 字节）client 端已经发送")
+                if in_retransmit:
+                    print(f"重传第 {seq_no} 个（第 {byte_starts[next_seq]}~"
+                          f"{byte_ends[next_seq]} 字节）数据包")
+                else:
+                    print(f"第 {seq_no} 个（第 {byte_starts[next_seq]}~"
+                          f"{byte_ends[next_seq]} 字节）client 端已经发送")
                 log_event(
                     f"Send: 数据包 (Type=3), Seq={seq_no}, "
                     f"长度={pkt_size}B, "
@@ -174,6 +179,8 @@ def main():
                         f"Recv: 重复 ACK, AckSeq={ack_seq}, "
                         f"当前base={base+1}(1-based)"
                     )
+                else:
+                    in_retransmit = False  # 收到新 ACK，退出重传阶段
 
             except socket.timeout:
                 # --- 3d. 超时 → Go-Back-N 重传 ---
@@ -191,6 +198,7 @@ def main():
                     # GBN: 回退窗口，重置在途字节
                     next_seq = base
                     bytes_in_flight = 0
+                    in_retransmit = True
 
         # ================================================================
         # 阶段 4: 传输完成，计算统计数据
@@ -208,17 +216,15 @@ def main():
             std_rtt = rtt_series.std()        # ★ 新增: 标准差
 
             # ★ 修复点: 丢包率 = 30 / 实际发送次数 × 100%
-            # （这里"丢包率"按任务书要求定义为成功包数占总发送次数的比例）
-            success_rate = (TOTAL_PACKETS / total_transmissions) * 100
-            drop_rate = 100 - success_rate
+            # （按任务书定义: 丢包率 = 原始包数 ÷ 总发送次数）
+            drop_rate = (TOTAL_PACKETS / total_transmissions) * 100
 
             stats_text = (
                 f"【UDP 模拟 TCP 传输统计报告】\n"
                 f"{'=' * 40}\n"
                 f"总计成功发送包数: {TOTAL_PACKETS}\n"
                 f"实际尝试发送次数 (含重传): {total_transmissions}\n"
-                f"成功送达率: {success_rate:.2f}%\n"
-                f"网络丢包/重传率: {drop_rate:.2f}%\n"
+                f"丢包率: {drop_rate:.2f}%\n"
                 f"{'=' * 40}\n"
                 f"最大 RTT: {max_rtt:.2f} ms\n"
                 f"最小 RTT: {min_rtt:.2f} ms\n"
@@ -236,7 +242,7 @@ def main():
 
             log_event(
                 f"统计报告: 发送{TOTAL_PACKETS}包/实际{total_transmissions}次, "
-                f"成功送达率={success_rate:.2f}%, "
+                f"丢包率={drop_rate:.2f}%, "
                 f"avgRTT={avg_rtt:.2f}ms, stdRTT={std_rtt:.2f}ms, "
                 f"minRTT={min_rtt:.2f}ms, maxRTT={max_rtt:.2f}ms"
             )
