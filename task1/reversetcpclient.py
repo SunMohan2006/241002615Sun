@@ -36,10 +36,11 @@ def generate_chunks(total_length, lmin, lmax, seed=None):
 
 
 def main():
-    # ★ 新增可选的 Seed 参数
-    if len(sys.argv) < 5 or len(sys.argv) > 6:
-        print("用法: python reversetcpclient.py <IP> <Port> <Lmin> <Lmax> [Seed]")
-        print("  Seed: 可选，随机种子，用于复现分块结果（验收需要）")
+    # 用法: IP Port Lmin Lmax [Seed] [FilePath]
+    if len(sys.argv) < 5 or len(sys.argv) > 7:
+        print("用法: python reversetcpclient.py <IP> <Port> <Lmin> <Lmax> [Seed] [FilePath]")
+        print("  Seed:     可选，随机种子，用于复现分块结果")
+        print("  FilePath: 可选，待发送的ASCII文件路径（默认 input.txt）")
         sys.exit(1)
 
     # 每次启动客户端时，清空旧日志和旧输出文件
@@ -50,23 +51,30 @@ def main():
     server_port = int(sys.argv[2])
     lmin = int(sys.argv[3])
     lmax = int(sys.argv[4])
-    seed = int(sys.argv[5]) if len(sys.argv) == 6 else None
+    seed = int(sys.argv[5]) if len(sys.argv) >= 6 else None
+    file_path = sys.argv[6] if len(sys.argv) >= 7 else "input.txt"
 
-    # 构造待发送的 ASCII 文件内容
-    file_content = b"a little monkey is jumping on the tree."
+    # 从文件读取待发送的 ASCII 内容
+    try:
+        with open(file_path, "rb") as f:
+            file_content = f.read()
+    except FileNotFoundError:
+        print(f"[!] 错误: 文件 '{file_path}' 不存在")
+        sys.exit(1)
+
     total_length = len(file_content)
+    print(f"[*] 已读取文件 '{file_path}' ({total_length} 字节)")
 
-    # ★  使用可复现的分块算法
+    # 使用可复现的分块算法
     chunk_sizes, n_chunks = generate_chunks(total_length, lmin, lmax, seed)
 
-    # 在日志中记录分块信息（总长度、分块数、每块长度、Seed）
+    # 在日志中记录分块信息（便于验收时核对）
     log_event(
-        f"分块参数: 文件总长={total_length}B, Lmin={lmin}, Lmax={lmax}, "
+        f"分块参数: 文件='{file_path}', 总长={total_length}B, Lmin={lmin}, Lmax={lmax}, "
         f"Seed={seed if seed is not None else '无(随机)'}, "
         f"N={n_chunks}, 各块长度={chunk_sizes}"
     )
-    print(f"[*] 文件总长={total_length}B, N={n_chunks}块, "
-          f"各块长度={chunk_sizes}")
+    print(f"[*] N={n_chunks}块, 各块长度={chunk_sizes}")
 
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
@@ -112,8 +120,7 @@ def main():
                     )
 
                     decoded_text = reversed_data.decode('ascii')
-                    # 要求示例: "8: yeknom elttil a."
-                    print(f"{i+1}: {decoded_text}")
+                    print(f"第 {i+1} 块：{decoded_text}")
 
                     # 全局倒序：新收到的块拼在前面
                     final_reversed_text = decoded_text + final_reversed_text

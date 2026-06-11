@@ -1,12 +1,12 @@
-[2026-06-11 13:07:53.848] 分块参数: 文件总长=39B, Lmin=10, Lmax=15, Seed=42, N=4, 各块长度=[15, 10, 10, 4]
-[2026-06-11 13:07:53.850] Send: Initialization 报文 (Type=1), 请求块数 N=4
-[2026-06-11 13:07:53.853] Recv: agree 报文 (Type=2)
-[2026-06-11 13:07:53.854] Send: reverseRequest 报文 (Type=3), 第 1 块, 长度=15
-[2026-06-11 13:07:53.855] Recv: reverseAnswer 报文 (Type=4), 第 1 块, 长度=15
-[2026-06-11 13:07:53.855] Send: reverseRequest 报文 (Type=3), 第 2 块, 长度=10
-[2026-06-11 13:07:53.856] Recv: reverseAnswer 报文 (Type=4), 第 2 块, 长度=10
-[2026-06-11 13:07:53.857] Send: reverseRequest 报文 (Type=3), 第 3 块, 长度=10
-[2026-06-11 13:07:53.858] Recv: reverseAnswer 报文 (Type=4), 第 3 块, 长度=10
-[2026-06-11 13:07:53.859] Send: reverseRequest 报文 (Type=3), 第 4 块, 长度=4
-[2026-06-11 13:07:53.860] Recv: reverseAnswer 报文 (Type=4), 第 4 块, 长度=4
-[2026-06-11 13:07:53.861] 传输完成: 共 4 块, 反转文本已保存
+[2026-06-11 17:17:50.931] 分块参数: 文件='input.txt', 总长=39B, Lmin=10, Lmax=15, Seed=42, N=4, 各块长度=[15, 10, 10, 4]
+[2026-06-11 17:17:50.932] Send: Initialization 报文 (Type=1), 请求块数 N=4
+[2026-06-11 17:17:50.933] Recv: agree 报文 (Type=2)
+[2026-06-11 17:17:50.934] Send: reverseRequest 报文 (Type=3), 第 1 块, 长度=15
+[2026-06-11 17:17:50.935] Recv: reverseAnswer 报文 (Type=4), 第 1 块, 长度=15
+[2026-06-11 17:17:50.935] Send: reverseRequest 报文 (Type=3), 第 2 块, 长度=10
+[2026-06-11 17:17:50.936] Recv: reverseAnswer 报文 (Type=4), 第 2 块, 长度=10
+[2026-06-11 17:17:50.937] Send: reverseRequest 报文 (Type=3), 第 3 块, 长度=10
+[2026-06-11 17:17:50.938] Recv: reverseAnswer 报文 (Type=4), 第 3 块, 长度=10
+[2026-06-11 17:17:50.938] Send: reverseRequest 报文 (Type=3), 第 4 块, 长度=4
+[2026-06-11 17:17:50.939] Recv: reverseAnswer 报文 (Type=4), 第 4 块, 长度=4
+[2026-06-11 17:17:50.940] 传输完成: 共 4 块, 反转文本已保存
